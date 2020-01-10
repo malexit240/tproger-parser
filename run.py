@@ -31,7 +31,7 @@ def get_articles_info_from_pages(page_count: int):
         response = requests.get('https://tproger.ru/page/%s/' % (counter+1))
         page = html.fromstring(response.content)
         links.append(page.xpath(
-            '//article[contains(@id, "post") and not(contains(@class, "category-quiz"))]/a/@href'))
+            '//article[contains(@class, "category-articles") or contains(@class, "category-translation") or contains(@class,"category-interview")]/a/@href'))
     links = list(itertools.chain.from_iterable(links))
 
     return [get_article_info(link) for link in links]
