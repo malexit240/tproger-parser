@@ -7,6 +7,16 @@ import requests
 from lxml import html
 
 
+def get_article_body(page):
+    return ''.join(page.xpath(
+        '//div[contains(@itemprop, "articleBody")]/*[not(contains(@class,"epigraph")) and not(contains(@class,"entry-meta"))]//text()')[:-3]
+    ).strip().replace('\n', '').replace('\r', '')
+
+
+def get_article_images(page):
+    return page.xpath('//noscript/img[contains(@class,"size-full")]/@src | //noscript/img[contains(@class,"image-tool")]/@src')
+
+
 def get_article_info(url: str):
     """returns info about a article"""
     response = requests.get(url)
@@ -15,10 +25,8 @@ def get_article_info(url: str):
     return {
         'url': url,
         'title': page.xpath('//h1[contains(@class,"title")]/text()')[0],
-        'body': ''.join(page.xpath(
-            '//div[contains(@itemprop, "articleBody")]/*[not(div)]/text()')
-        ).strip().replace('\n', ''),
-        'images':  page.xpath('//noscript/img[contains(@class,"size-full")]/@src | //noscript/img[contains(@class,"image-tool")]/@src'),
+        'body': get_article_body(page),
+        'images': get_article_images(page),
         'datePublished': page.xpath('//div[contains(@class, "post-meta")]/ul/li/time/@datetime')[0],
     }
 
